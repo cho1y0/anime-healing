@@ -1,0 +1,45 @@
+/* css/style.css */
+
+/* 깔끔한 최신 웹 폰트 적용 */
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+:root {
+    /* 화려한 오로라/홀로그램 테마 변수 */
+    --bg-gradient: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 50%, #8fd3f4 100%);
+    
+    /* 유리 질감 (Glassmorphism) 효과 변수 */
+    --glass-bg: rgba(255, 255, 255, 0.3);
+    --glass-border: rgba(255, 255, 255, 0.5);
+    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+    
+    /* 포인트 컬러 */
+    --primary-color: #6a11cb; 
+    --primary-hover: #2575fc;
+    --text-main: #333333;
+    
+    --border-radius: 20px;
+    --transition-speed: 0.4s ease;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    /* 움직이는 배경 애니메이션 적용 */
+    background: var(--bg-gradient);
+    background-size: 200% 200%;
+    animation: gradientMove 10s ease infinite; 
+    color: var(--text-main);
+    font-family: 'Pretendard', sans-serif;
+    min-height: 100vh;
+}
+
+/* 배경이 은은하게 움직이는 키프레임 */
+@keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
