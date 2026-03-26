@@ -3,7 +3,7 @@ from app.database import engine, Base
 from app.models.models import (
     User, UserPreference, AnimeCache, Review, Watchlist, AiSummary
 )
-from app.routers import auth, preferences, anime
+from app.routers import auth, preferences, anime, reviews
 
 # 테이블 자동 생성
 Base.metadata.create_all(bind=engine)
@@ -19,6 +19,7 @@ app = FastAPI(
 app.include_router(auth.router)
 app.include_router(preferences.router)
 app.include_router(anime.router)
+app.include_router(reviews.router)
 
 
 @app.get("/", tags=["Health Check"])

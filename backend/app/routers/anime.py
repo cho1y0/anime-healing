@@ -10,6 +10,7 @@ from app.services.jikan import (
     cache_anime,
     get_cached_anime,
 )
+from app.services.ai import generate_ai_comments_batch
 
 router = APIRouter(prefix="/anime", tags=["애니"])
 
@@ -21,7 +22,7 @@ def recommend_anime(
 ):
     """
     맞춤 추천 API (로그인 필수)
-    저장된 취향 설정(장르 + 평점 구간)으로 자동 검색
+    저장된 취향 설정으로 자동 검색 + Gemini AI 추천 코멘트 생성
     """
 
     # 1) 유저 취향 설정 조회
@@ -44,9 +45,15 @@ def recommend_anime(
         score_max=preference.score_max,
     )
 
-    # 3) 검색 결과 캐싱
+    # 3) 캐싱
     for anime in results:
         cache_anime(db, anime)
+
+    # 4) Gemini AI 코멘트 한 번에 생성 (API 1회 호출)
+    if results:
+        comments = generate_ai_comments_batch(results)
+        for i, anime in enumerate(results):
+            anime["ai_comment"] = comments[i]
 
     return {
         "success": True,
@@ -65,10 +72,8 @@ def search_anime(
 ):
     """
     직접 검색 API (로그인 불필요)
-    장르, 평점 구간, 페이지를 직접 지정해서 검색
     """
 
-    # 1) 장르 문자열을 리스트로 변환
     try:
         genre_ids = [int(g.strip()) for g in genres.split(",")]
     except ValueError:
@@ -77,14 +82,12 @@ def search_anime(
             detail="장르 ID는 숫자를 쉼표로 구분해야 합니다. (예: 1,22,36)",
         )
 
-    # 2) 평점 범위 검사
     if score_min >= score_max:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="최소 평점은 최대 평점보다 작아야 합니다.",
         )
 
-    # 3) Jikan API 호출
     results = search_anime_sync(
         genres=genre_ids,
         score_min=score_min,
@@ -92,7 +95,6 @@ def search_anime(
         page=page,
     )
 
-    # 4) 결과 캐싱
     for anime in results:
         cache_anime(db, anime)
 
@@ -110,10 +112,8 @@ def get_anime_detail(
 ):
     """
     작품 상세 API (로그인 불필요)
-    캐시에 있으면 캐시 데이터 반환, 없으면 Jikan API 호출
     """
 
-    # 1) 캐시 먼저 확인
     cached = get_cached_anime(db, mal_id)
     if cached:
         return {
@@ -122,7 +122,6 @@ def get_anime_detail(
             "data": cached,
         }
 
-    # 2) 캐시에 없으면 Jikan API 호출
     detail = get_anime_detail_sync(mal_id)
     if not detail:
         raise HTTPException(
@@ -130,7 +129,6 @@ def get_anime_detail(
             detail="작품을 찾을 수 없습니다.",
         )
 
-    # 3) 결과 캐싱
     cache_anime(db, detail)
 
     return {
