@@ -3,7 +3,7 @@ from app.database import engine, Base
 from app.models.models import (
     User, UserPreference, AnimeCache, Review, Watchlist, AiSummary
 )
-from app.routers import auth, preferences, anime, reviews
+from app.routers import auth, preferences, anime, reviews, watchlist
 
 # 테이블 자동 생성
 Base.metadata.create_all(bind=engine)
@@ -20,6 +20,7 @@ app.include_router(auth.router)
 app.include_router(preferences.router)
 app.include_router(anime.router)
 app.include_router(reviews.router)
+app.include_router(watchlist.router)
 
 
 @app.get("/", tags=["Health Check"])
