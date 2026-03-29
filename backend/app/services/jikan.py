@@ -145,6 +145,13 @@ def _translate_genres(raw_genres: list) -> list[str]:
     return result
 
 
+def _force_https(url: str) -> str:
+    """HTTP URL을 HTTPS로 변환 (Mixed Content 방지)"""
+    if url and url.startswith("http://"):
+        return url.replace("http://", "https://", 1)
+    return url
+
+
 def _parse_anime_list(anime_list: list) -> list[dict]:
     """
     Jikan API 응답에서 필요한 필드만 추출 (목록용)
@@ -159,8 +166,8 @@ def _parse_anime_list(anime_list: list) -> list[dict]:
             "genre_ids": [g["mal_id"] for g in raw_genres],
             "score": anime.get("score", 0),
             "synopsis": anime.get("synopsis", ""),
-            "image_url": anime.get("images", {}).get("jpg", {}).get("image_url", ""),
-            "image_url_large": anime.get("images", {}).get("jpg", {}).get("large_image_url", ""),
+            "image_url": _force_https(anime.get("images", {}).get("jpg", {}).get("image_url", "")),
+            "image_url_large": _force_https(anime.get("images", {}).get("jpg", {}).get("large_image_url", "")),
             "episodes": anime.get("episodes"),
             "status": anime.get("status", ""),
             "year": anime.get("year"),
@@ -184,7 +191,7 @@ def _parse_anime_detail(anime: dict) -> dict:
         "rank": anime.get("rank"),
         "popularity": anime.get("popularity"),
         "synopsis": anime.get("synopsis", ""),
-        "image_url": anime.get("images", {}).get("jpg", {}).get("large_image_url", ""),
+        "image_url": _force_https(anime.get("images", {}).get("jpg", {}).get("large_image_url", "")),
         "episodes": anime.get("episodes"),
         "status": anime.get("status", ""),
         "aired": anime.get("aired", {}).get("string", ""),

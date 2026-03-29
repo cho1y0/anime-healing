@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.addEventListener('click', async () => {
                 const idToDelete = parseInt(btn.dataset.id);
                 try {
-                    await apiFetch(`/watchlist/${idToDelete}`, 'DELETE');
+                    await apiFetch(`/api/watchlist/${idToDelete}`, 'DELETE');
                     showToast('목록에서 삭제되었습니다.', 'info');
                     loadWatchlist(); 
                 } catch (error) { showToast('삭제 실패', 'error'); }
@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 🚀 [API 연동] 찜 목록 가져오기
     async function loadWatchlist() {
         try {
-            const response = await apiFetch('/watchlist', 'GET');
+            const response = await apiFetch('/api/watchlist', 'GET');
             renderWatchlist(response.data);
         } catch (error) { renderWatchlist([]); }
     }

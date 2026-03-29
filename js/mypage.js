@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // ── 프로필 정보 로드 ──────────────────────────────────────
     try {
-        const res = await apiFetch('/users/me', 'GET');
+        const res = await apiFetch('/api/users/me', 'GET');
         const { username, nickname, gender, age_group } = res.data;
         document.getElementById('display-username').innerText = username;
         document.getElementById('display-nickname').innerText = nickname;
@@ -16,9 +16,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('nickname-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const nickname = document.getElementById('new-nickname').value.trim();
+        const currentNickname = document.getElementById('display-nickname').innerText;
 
         if (!nickname) {
             showToast('닉네임을 입력해주세요.', 'error', 'top-center');
+            return;
+        }
+        if (nickname === currentNickname) {
+            showToast('현재 닉네임과 동일합니다.', 'info', 'top-center');
             return;
         }
         if (nickname.length > 50) {
@@ -27,7 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         try {
-            const res = await apiFetch('/users/me/nickname', 'PUT', { nickname });
+            const res = await apiFetch('/api/users/me/nickname', 'PUT', { nickname });
             // localStorage의 표시 이름도 갱신
             localStorage.setItem('username', res.data.nickname);
             document.getElementById('display-nickname').innerText = res.data.nickname;
@@ -50,6 +55,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             showToast('현재 비밀번호를 입력해주세요.', 'error', 'top-center');
             return;
         }
+        if (newPw === currentPw) {
+            showToast('새 비밀번호가 현재 비밀번호와 동일합니다.', 'error', 'top-center');
+            return;
+        }
         if (newPw.length < 10 || !/[A-Z]/.test(newPw) || !/[a-z]/.test(newPw) || !/[0-9]/.test(newPw)) {
             showToast('새 비밀번호는 10자 이상, 대/소문자, 숫자를 포함해야 합니다.', 'error', 'top-center');
             return;
@@ -60,7 +69,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         try {
-            await apiFetch('/users/me/password', 'PUT', {
+            await apiFetch('/api/users/me/password', 'PUT', {
                 current_password: currentPw,
                 new_password: newPw,
                 new_password_confirm: newPwConfirm,
