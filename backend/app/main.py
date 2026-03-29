@@ -49,12 +49,12 @@ app.add_exception_handler(RequestValidationError, validation_exception_handler)
 app.add_exception_handler(Exception, general_exception_handler)
 
 # ===== 라우터 등록 =====
-app.include_router(auth.router)
-app.include_router(preferences.router)
-app.include_router(anime.router)
-app.include_router(reviews.router)
-app.include_router(watchlist.router)
-app.include_router(profile.router)
+app.include_router(auth.router, prefix="/api")
+app.include_router(preferences.router, prefix="/api")
+app.include_router(anime.router, prefix="/api")
+app.include_router(reviews.router, prefix="/api")
+app.include_router(watchlist.router, prefix="/api")
+app.include_router(profile.router, prefix="/api")
 
 
 @app.get("/", tags=["서버 상태"])
