@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from sqlalchemy.orm.attributes import flag_modified
 from app.database import get_db
 from app.models.models import User, UserPreference
 from app.schemas.preferences import (
@@ -88,6 +89,7 @@ def update_my_preferences(
     if preference:
         # 기존 설정이 있으면 수정
         preference.genres = req.genres
+        flag_modified(preference, "genres")
         preference.score_min = req.score_min
         preference.score_max = req.score_max
     else:
